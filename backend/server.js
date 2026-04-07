@@ -30,7 +30,7 @@ app.use('/api/requests', requestsRoutes);
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 // Catch-all route for React Router (must be placed after all API routes!)
-app.get('(.*)', (req, res) => {
+app.get(/^.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 

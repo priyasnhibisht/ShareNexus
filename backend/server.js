@@ -18,8 +18,7 @@ app.use(express.json());
 const connectDB = require('./database/db');
 connectDB();
 
-// simple check to make sure the server isn't dead
-app.get('/', (req, res) => res.send('ShareNexus backend running'));
+// The root '/' backend override was removed so the React app can load properly here!
 
 // hook up all the different routes here
 app.use('/api/auth', authRoutes);

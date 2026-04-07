@@ -1,0 +1,37 @@
+/* 🧾 Container */
+.dashboard-container {
+  padding: 40px;
+}
+
+/* 🏷 Title */
+.dashboard-title {
+  color: #e5e7eb;
+  margin-bottom: 30px;
+}
+
+/* 🧱 Cards Layout (THIS IS THE MAIN FIX) */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 in one row */
+  gap: 20px;
+}
+
+/* 💜 Card Style */
+.dashboard-card {
+  padding: 25px;
+  border-radius: 18px;
+
+  background: #ede9fe;
+  border: 1px solid #ddd6fe;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+  transition: all 0.3s ease;
+  color: #3b3b8f;
+}
+
+/* ✨ Hover Effect */
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}

@@ -1,0 +1,173 @@
+/* 🌍 Global Reset */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+
+  background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+
+  position: relative;
+  color: #f1f5f9;
+}
+
+/* ✨ Smooth transitions */
+* {
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* 🌟 Background ONLY for selected pages */
+.page-bg {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 🖼 Center Image (70%) */
+.page-bg::before {
+  content: "";
+  position: absolute;
+
+  width: 70%;
+  height: 65%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.7)),
+    url("https://media.istockphoto.com/id/1395650800/vector/creative-ideas-sharing-vector-concept.jpg?s=612x612&w=0&k=20&c=KMYY4fq9DKGe8CirBvWn2yHn5LHtwsBSu72MGA5j3T8=");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+
+  z-index: -1;
+
+  animation: zoomBg 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* 💎 Glow Effect */
+body::after {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(168, 85, 247, 0.12);
+  filter: blur(150px);
+  bottom: 10%;
+  right: 10%;
+  z-index: -2;
+}
+
+/* 🧾 Card Styling */
+.card {
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 🔥 Card Hover */
+.card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* ✏️ Input Fields */
+input.form-control {
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+input.form-control:focus {
+  border: 1px solid #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+  outline: none;
+}
+
+/* 🔘 Buttons */
+button {
+  border-radius: 25px !important;
+  font-weight: 500;
+  padding: 10px;
+  border: none;
+}
+
+/* 🔥 Button Hover */
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* 🌟 Primary Button */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+/* 🟢 Success Button */
+.btn-success {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+/* 🧭 Navbar */
+.navbar {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.navbar a {
+  color: #f1f5f9 !important;
+}
+
+.navbar a:hover {
+  color: #3b82f6 !important;
+}
+
+/* 🏠 Dashboard Cards */
+.dashboard-card {
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+/* 🎬 Animation */
+@keyframes zoomBg {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

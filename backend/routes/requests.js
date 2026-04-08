@@ -135,17 +135,17 @@ router.get('/contact/:requestId', auth, async (req, res) => {
       return res.status(404).json({ message: 'Listing not found' });
     }
 
-    // look up both parties so we can return names + emails
+    // look up both parties so we can return names + emails + phones
     const owner = await User.findById(request.ownerId);
     const requester = await User.findById(request.requesterId);
 
     return res.status(200).json({
       ownerName: owner?.name,
       ownerEmail: owner?.email,
-      ownerContact: listing.ownerContact || '',
+      ownerPhone: owner?.phone || listing.ownerContact || '',
       requesterName: requester?.name,
       requesterEmail: requester?.email,
-      requesterContact: '',
+      requesterPhone: requester?.phone || '',
     });
   } catch (err) {
     console.error('Contact fetch error:', err.message);

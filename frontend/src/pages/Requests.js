@@ -264,7 +264,7 @@ function Requests() {
 
                     {contactByRequestId[r._id] && (
                       <div className="contact">
-                        <p>📞 Phone: {contactByRequestId[r._id]?.requesterContact}</p>
+                        <p>📞 Phone: {contactByRequestId[r._id]?.requesterPhone || 'Not provided'}</p>
                         <p>📧 Email: {contactByRequestId[r._id]?.requesterEmail}</p>
                       </div>
                     )}
@@ -320,7 +320,7 @@ function Requests() {
 
           {contactByRequestId[r._id] && (
             <div className="contact">
-              <p>📞 Phone: {contactByRequestId[r._id]?.ownerContact}</p>
+              <p>📞 Phone: {contactByRequestId[r._id]?.ownerPhone || 'Not provided'}</p>
               <p>📧 Email: {contactByRequestId[r._id]?.ownerEmail}</p>
             </div>
           )}

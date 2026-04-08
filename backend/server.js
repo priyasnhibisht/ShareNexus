@@ -10,8 +10,11 @@ const requestsRoutes = require('./routes/requests');
 
 const app = express();
 
-// allow all origins in production
-app.use(cors());
+// allow configured origin in production
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // this connects our app to mongodb

@@ -122,7 +122,7 @@ function Listings({ category }) {
               <p><b>{item.ownerName}</b></p>
 
               {/* ✅ DELETE ONLY IF OWNER */}
-              {user && user._id === item.ownerId && (
+              {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
                 <button
                   className="delete-btn"
                   onClick={() => handleDelete(item._id)}

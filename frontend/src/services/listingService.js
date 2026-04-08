@@ -9,9 +9,10 @@ export const getListings = async () => {
 // ✅ ONLY USER LISTINGS
 export const getMyListings = async () => {
   const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user._id || user.id;
   console.log('getMyListings: user object from localStorage:', user);
-  console.log('getMyListings: calling GET /listings/my/', user._id);
-  const res = await api.get(`/listings/my/${user._id}`);
+  console.log('getMyListings: calling GET /listings/my/', userId);
+  const res = await api.get(`/listings/my/${userId}`);
   console.log('getMyListings: response data:', res.data);
   return res.data;
 };
@@ -33,7 +34,6 @@ export const createListing = async (data) => {
 
 // ✅ DELETE
 export const deleteListing = async (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const res = await api.delete(`/listings/${id}/${user._id}`);
+  const res = await api.delete(`/listings/${id}`);
   return res.data;
 };

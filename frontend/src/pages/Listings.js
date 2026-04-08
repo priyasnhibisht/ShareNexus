@@ -18,15 +18,19 @@ function Listings({ category }) {
   // ✅ FETCH ONLY USER LISTINGS
   const fetchListings = async () => {
     try {
+      console.log('fetchListings: user from localStorage:', user);
       const data = await getMyListings(); // ✅ IMPORTANT FIX
+      console.log('fetchListings: received data from getMyListings:', data);
 
       const filtered = data.filter(
         (item) => item.category === category
       );
+      console.log('fetchListings: filtered listings for category', category, ':', filtered);
 
       setListings(filtered);
     } catch (err) {
-      console.log("Error fetching listings", err);
+      console.error("Error fetching listings", err);
+      setError("Error fetching listings: " + (err.message || JSON.stringify(err)));
     }
   };
 

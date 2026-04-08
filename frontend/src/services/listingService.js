@@ -9,7 +9,10 @@ export const getListings = async () => {
 // ✅ ONLY USER LISTINGS
 export const getMyListings = async () => {
   const user = JSON.parse(localStorage.getItem("user"));
+  console.log('getMyListings: user object from localStorage:', user);
+  console.log('getMyListings: calling GET /listings/my/', user._id);
   const res = await api.get(`/listings/my/${user._id}`);
+  console.log('getMyListings: response data:', res.data);
   return res.data;
 };
 

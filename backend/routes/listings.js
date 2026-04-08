@@ -39,9 +39,17 @@ router.get('/', async (req, res) => {
 // get listings by owner ID
 router.get('/my/:userId', async (req, res) => {
   try {
-    const listings = await Listing.find({ owner: req.params.userId }).sort({ createdAt: -1 });
+    const mongoose = require('mongoose');
+    console.log('GET /listings/my/:userId - userId param (string):', req.params.userId);
+    console.log('GET /listings/my/:userId - userId as ObjectId:', new mongoose.Types.ObjectId(req.params.userId));
+    
+    const listings = await Listing.find({ owner: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
+    console.log('GET /listings/my/:userId - found listings count:', listings.length);
+    console.log('GET /listings/my/:userId - found listings:', listings);
+    
     return res.status(200).json(listings);
   } catch (err) {
+    console.error('GET /listings/my/:userId - error:', err);
     return res.status(500).json({ message: 'Server error' });
   }
 });

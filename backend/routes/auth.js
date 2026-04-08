@@ -2,17 +2,10 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const User = require('../models/User');
 
-// Create email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // signup route
 router.post('/register', async (req, res) => {
@@ -136,11 +129,11 @@ router.post('/forgot-password', async (req, res) => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
     console.log('4. Reset link:', resetLink);
     
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    await resend.emails.send({
+      from: 'ShareNexus <onboarding@resend.dev>',
       to: user.email,
-      subject: 'Password Reset',
-      text: `Reset your password: ${resetLink}`
+      subject: 'Reset Your ShareNexus Password',
+      html: `<h2>Password Reset</h2><p>Click to reset your password (expires in 1 hour):</p><a href="${resetLink}">${resetLink}</a>`
     });
     console.log('5. Email sent successfully');
     

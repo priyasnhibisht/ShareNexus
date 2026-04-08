@@ -11,7 +11,7 @@ export const sendRequest = async (listingId) => {
 
 // ✅ GET RECEIVED REQUESTS (OWNER)
 export const getReceivedRequests = async () => {
-  const res = await api.get("/requests/received");  // ✅ FIXED
+  const res = await api.get("/requests/mine");  // ✅ FIXED - matches backend
   return res.data;
 };
 
@@ -29,7 +29,7 @@ export const rejectRequest = async (requestId) => {
 
 // ✅ GET CONTACT
 export const getContact = async (requestId) => {
-  const res = await api.get(`/requests/${requestId}/contact`);
+  const res = await api.get(`/requests/contact/${requestId}`);
   return res.data;
 };
 

@@ -36,5 +36,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+// get listings by owner ID
+router.get('/my/:userId', async (req, res) => {
+  try {
+    const listings = await Listing.find({ owner: req.params.userId }).sort({ createdAt: -1 });
+    return res.status(200).json(listings);
+  } catch (err) {
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
 

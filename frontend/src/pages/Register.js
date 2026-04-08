@@ -10,7 +10,7 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [course, setCourse] = useState("");
-  const [contact, setContact] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ function Register() {
 
     try {
       console.log("Calling API...");
-      const user = await register(name, email, password, course, contact);
+      const user = await register(name, email, password, course, phone);
       console.log("SUCCESS:", user);
 
       navigate("/");
@@ -107,11 +107,11 @@ function Register() {
         </div>
 
         <input
-          type="text"
-          placeholder="Enter contact number"
+          type="tel"
+          placeholder="Phone number (optional)"
           className="login-input"
-          value={contact}
-          onChange={(e) => setContact(e.target.value)}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
         />
 
         {/* ✅ IMPORTANT: type="submit" */}

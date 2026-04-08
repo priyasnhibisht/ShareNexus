@@ -9,13 +9,13 @@ export const login = async (email, password) => {
   return res.data.user;
 };
 
-export const register = async (name, email, password, course, contact) => {
+export const register = async (name, email, password, course, phone) => {
   const res = await api.post("/auth/register", {
     name,
     email,
     password,
     course,
-    contact
+    phone
   });
 
   localStorage.setItem("token", res.data.token);

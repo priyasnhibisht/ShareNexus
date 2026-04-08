@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 // signup route
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, course } = req.body;
+    const { name, email, password, course, phone } = req.body;
 
     if (!name || !email || !password || !course) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -37,6 +37,7 @@ router.post('/register', async (req, res) => {
       email: email.toLowerCase().trim(),
       password: hashedPassword,
       course: course.trim(),
+      phone: phone ? phone.trim() : '',
     });
 
     const token = jwt.sign(
@@ -46,6 +47,7 @@ router.post('/register', async (req, res) => {
           name: user.name,
           email: user.email,
           course: user.course,
+          phone: user.phone,
         },
       },
       process.env.JWT_SECRET,
@@ -59,6 +61,7 @@ router.post('/register', async (req, res) => {
         name: user.name,
         email: user.email,
         course: user.course,
+        phone: user.phone,
         createdAt: user.createdAt,
       },
     });

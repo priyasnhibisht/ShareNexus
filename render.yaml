@@ -18,3 +18,5 @@ services:
         value: https://sharenexus-vgz1.onrender.com
       - key: BACKEND_URL
         value: https://sharenexus-vgz1.onrender.com
+      - key: RESEND_API_KEY
+  value: re_E9JB1pNc_3ATSnyuJtr9bLMRGe6jQp6q4

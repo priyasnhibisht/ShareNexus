@@ -36,14 +36,8 @@ function Dashboard() {
       setSkillCount(skills.length);
 
       // ✅ REQUESTS
-      const data = await getReceivedRequests();
-
-      // 🔥 IMPORTANT FIX: use 'data' not 'requests'
-      const received = data.filter(
-        (r) => r.ownerId === user._id
-      );
-
-      setReceivedCount(received.length);
+      const received = await getReceivedRequests();
+      setReceivedCount(Array.isArray(received) ? received.length : 0);
 
     } catch (err) {
       console.log("Error fetching dashboard data", err);

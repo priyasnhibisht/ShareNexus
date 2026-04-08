@@ -39,8 +39,9 @@ export const getContact = async (requestId) => {
 export const getSentRequests = async () => {
   const user = JSON.parse(localStorage.getItem("user"));
   console.log('getSentRequests: user from localStorage:', user);
-  console.log('getSentRequests: calling GET /api/requests/sent/', user?._id);
-  const res = await api.get(`/requests/sent/${user._id}`);
+  const userId = user?._id || user?.id;
+  console.log('getSentRequests: calling GET /api/requests/sent/', userId);
+  const res = await api.get(`/requests/sent/${userId}`);
   console.log('getSentRequests: response from /requests/sent/:userId:', res);
   console.log('getSentRequests: res.data:', res.data);
   return res.data;

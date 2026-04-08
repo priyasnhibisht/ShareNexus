@@ -13,7 +13,7 @@ services:
       - key: EMAIL_USER
         value: priyanshibisht98@gmail.com
       - key: EMAIL_PASS
-        value: oejy wtnj cprr ppkg
+        value: oejywtnjcprrppkg
       - key: FRONTEND_URL
         value: https://sharenexus-vgz1.onrender.com
       - key: BACKEND_URL

@@ -32,14 +32,28 @@ function Requests() {
 
   // ✅ RECEIVED
   const refreshMyRequests = async () => {
-    const data = await getReceivedRequests();
-    setRequests(data);
+    try {
+      console.log('refreshMyRequests: calling getReceivedRequests()');
+      const data = await getReceivedRequests();
+      console.log('refreshMyRequests: received data:', data);
+      setRequests(data || []);
+    } catch (err) {
+      console.error('refreshMyRequests: error:', err);
+      setRequests([]);
+    }
   };
 
   // ✅ SENT
   const refreshSentRequests = async () => {
-    const data = await getSentRequests();
-    setSentRequests(data);
+    try {
+      console.log('refreshSentRequests: calling getSentRequests()');
+      const data = await getSentRequests();
+      console.log('refreshSentRequests: received data:', data);
+      setSentRequests(data || []);
+    } catch (err) {
+      console.error('refreshSentRequests: error:', err);
+      setSentRequests([]);
+    }
   };
 
   useEffect(() => {
@@ -47,28 +61,40 @@ function Requests() {
 
     if (!user) return;
 
-    // 🔹 Listings
-    setLoadingListings(true);
-    getListings()
-      .then((data) => {
-        if (isMounted) setListings(data);
-      })
-      .catch(() => {
-        if (isMounted) setSection1Error("Failed to load listings");
-      })
-      .finally(() => {
-        if (isMounted) setLoadingListings(false);
-      });
+    const loadAllData = async () => {
+      try {
+        // 🔹 Listings
+        setLoadingListings(true);
+        try {
+          console.log('useEffect: loading listings');
+          const listingsData = await getListings();
+          console.log('useEffect: listings data:', listingsData);
+          if (isMounted) setListings(listingsData || []);
+        } catch (err) {
+          console.error('useEffect: failed to load listings:', err);
+          if (isMounted) setSection1Error("Failed to load listings");
+        } finally {
+          if (isMounted) setLoadingListings(false);
+        }
 
-    // 🔹 Requests (BOTH)
-    setLoadingRequests(true);
-    Promise.all([refreshMyRequests(), refreshSentRequests()]) // ✅ FIX
-      .catch(() => {
-        if (isMounted) setSection2Error("Failed to load your requests");
-      })
-      .finally(() => {
-        if (isMounted) setLoadingRequests(false);
-      });
+        // 🔹 Requests (BOTH)
+        setLoadingRequests(true);
+        try {
+          console.log('useEffect: loading requests');
+          await Promise.all([refreshMyRequests(), refreshSentRequests()]);
+          console.log('useEffect: requests loaded');
+        } catch (err) {
+          console.error('useEffect: failed to load requests:', err);
+          if (isMounted) setSection2Error("Failed to load your requests");
+        } finally {
+          if (isMounted) setLoadingRequests(false);
+        }
+      } catch (err) {
+        console.error('useEffect: top-level catch:', err);
+      }
+    };
+
+    loadAllData();
 
     return () => {
       isMounted = false;
@@ -154,7 +180,7 @@ function Requests() {
           <div className="empty-card">No listings found 🚫</div>
         ) : (
           <div className="cards">
-            {listings.map((l) => (
+            {(listings || []).map((l) => (
               <div key={l._id} className="card">
                 <h3>{l.title}</h3>
                 <p>{l.description}</p>
@@ -186,7 +212,7 @@ function Requests() {
           <div className="empty-card">No requests yet 🤝</div>
         ) : (
           <div className="cards">
-            {requests.map((r) => (
+            {(requests || []).map((r) => (
               <div key={r._id} className="card">
                 <h3>{r.listingTitle}</h3>
                 <p>From: {r.requesterName}</p>

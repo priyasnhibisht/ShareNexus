@@ -11,7 +11,10 @@ export const sendRequest = async (listingId) => {
 
 // ✅ GET RECEIVED REQUESTS (OWNER)
 export const getReceivedRequests = async () => {
+  console.log('getReceivedRequests: calling GET /api/requests/mine');
   const res = await api.get("/requests/mine");  // ✅ FIXED - matches backend
+  console.log('getReceivedRequests: response from /requests/mine:', res);
+  console.log('getReceivedRequests: res.data:', res.data);
   return res.data;
 };
 
@@ -35,6 +38,10 @@ export const getContact = async (requestId) => {
 
 export const getSentRequests = async () => {
   const user = JSON.parse(localStorage.getItem("user"));
+  console.log('getSentRequests: user from localStorage:', user);
+  console.log('getSentRequests: calling GET /api/requests/sent/', user?._id);
   const res = await api.get(`/requests/sent/${user._id}`);
+  console.log('getSentRequests: response from /requests/sent/:userId:', res);
+  console.log('getSentRequests: res.data:', res.data);
   return res.data;
 };

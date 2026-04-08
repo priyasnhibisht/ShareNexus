@@ -108,7 +108,9 @@ function Requests() {
     setSection1Message("");
     setSection1Error("");
 
-    if (listing.ownerId === user._id) {
+    const currentUserId = user._id || user.id;
+    const ownerId = listing.owner?._id || listing.owner;
+    if (currentUserId?.toString() === ownerId?.toString()) {
       setSection1Error("You cannot request your own resource ❌");
       return;
     }

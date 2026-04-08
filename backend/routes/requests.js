@@ -35,12 +35,32 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// get requests made to my items
 router.get('/mine', auth, async (req, res) => {
   try {
+    console.log('GET /requests/mine - req.user:', req.user);
     const requests = await Request.find({ ownerId: req.user.id }).sort({ createdAt: -1 });
+    console.log('GET /requests/mine - found requests count:', requests.length);
+    console.log('GET /requests/mine - found requests:', requests);
     return res.status(200).json(requests);
   } catch (err) {
+    console.error('GET /requests/mine - error:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.get('/sent/:userId', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    console.log('GET /requests/sent/:userId - userId param (string):', req.params.userId);
+    console.log('GET /requests/sent/:userId - userId as ObjectId:', new mongoose.Types.ObjectId(req.params.userId));
+    
+    const requests = await Request.find({ requesterId: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
+    console.log('GET /requests/sent/:userId - found requests count:', requests.length);
+    console.log('GET /requests/sent/:userId - found requests:', requests);
+    
+    return res.status(200).json(requests);
+  } catch (err) {
+    console.error('GET /requests/sent/:userId - error:', err);
     return res.status(500).json({ message: 'Server error' });
   }
 });

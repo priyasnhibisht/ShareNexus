@@ -1,32 +1,40 @@
-import api from './api';
+import api from "./api";
 
-// POST /api/requests
+// ✅ SEND REQUEST (CLEAN VERSION)
 export const sendRequest = async (listingId) => {
-  const res = await api.post('/requests', { listingId });
+  const res = await api.post("/requests", {
+    listingId,   // ✅ ONLY send this
+  });
+
   return res.data;
 };
 
-// GET /api/requests/mine
-export const getMyRequests = async () => {
-  const res = await api.get('/requests/mine');
+// ✅ GET RECEIVED REQUESTS (OWNER)
+export const getReceivedRequests = async () => {
+  const res = await api.get("/requests/received");  // ✅ FIXED
   return res.data;
 };
 
-// PUT /api/requests/:id/approve
-export const approveRequest = async (id) => {
-  const res = await api.put(`/requests/${id}/approve`);
+// ✅ APPROVE
+export const approveRequest = async (requestId) => {
+  const res = await api.put(`/requests/${requestId}/approve`);
   return res.data;
 };
 
-// PUT /api/requests/:id/reject
-export const rejectRequest = async (id) => {
-  const res = await api.put(`/requests/${id}/reject`);
+// ✅ REJECT
+export const rejectRequest = async (requestId) => {
+  const res = await api.put(`/requests/${requestId}/reject`);
   return res.data;
 };
 
-// GET /api/requests/contact/:requestId
-export const getContact = async (id) => {
-  const res = await api.get(`/requests/contact/${id}`);
+// ✅ GET CONTACT
+export const getContact = async (requestId) => {
+  const res = await api.get(`/requests/${requestId}/contact`);
   return res.data;
 };
 
+export const getSentRequests = async () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const res = await api.get(`/requests/sent/${user._id}`);
+  return res.data;
+};

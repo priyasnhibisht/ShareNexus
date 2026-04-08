@@ -1,58 +1,93 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getListings } from "../services/listingService";
+import { getMyListings } from "../services/listingService";
+import { getReceivedRequests } from "../services/requestService";
 import { getCurrentUser } from "../services/authService";
-import { getAllListings } from "../services/listingService";
+
 import "./Dashboard.css";
 
 function Dashboard() {
-  const user = getCurrentUser();
-  const [listings, setListings] = useState([]);
   const navigate = useNavigate();
+  const user = getCurrentUser();
+
+  const [resourceCount, setResourceCount] = useState(0);
+  const [skillCount, setSkillCount] = useState(0);
+  const [receivedCount, setReceivedCount] = useState(0);
 
   useEffect(() => {
-    getAllListings().then(setListings).catch(console.error);
+    fetchCounts();
   }, []);
 
-  if (!user) {
-    return <Navigate to="/" />;
-  }
+  const fetchCounts = async () => {
+    try {
+      // ✅ LISTINGS
+      const listings = await getMyListings();
+
+      const resources = listings.filter(
+        (l) => l.category === "resource"
+      );
+
+      const skills = listings.filter(
+        (l) => l.category === "skill"
+      );
+
+      setResourceCount(resources.length);
+      setSkillCount(skills.length);
+
+      // ✅ REQUESTS
+      const data = await getReceivedRequests();
+
+      // 🔥 IMPORTANT FIX: use 'data' not 'requests'
+      const received = data.filter(
+        (r) => r.ownerId === user._id
+      );
+
+      setReceivedCount(received.length);
+
+    } catch (err) {
+      console.log("Error fetching dashboard data", err);
+    }
+  };
 
   return (
     <div className="dashboard-container">
-      <h2 className="dashboard-title">
+
+      <h1 className="dashboard-title">
         Welcome to ShareNexus 🎓
-      </h2>
+      </h1>
 
       <div className="dashboard-cards">
 
+        {/* RESOURCES */}
         <div
           className="dashboard-card"
           onClick={() => navigate("/listings/resources")}
-          style={{ cursor: "pointer" }}
         >
-          <h5>📦 Resources</h5>
-          <p>{`${listings.length} listings available`}</p>
+          📦 Resources
+          <p>{resourceCount} listings available</p>
         </div>
 
+        {/* SKILLS */}
         <div
           className="dashboard-card"
           onClick={() => navigate("/listings/skills")}
-          style={{ cursor: "pointer" }}
         >
-          <h5>🎯 Skills</h5>
-          <p>Teach and learn new skills</p>
+          🎯 Skills
+          <p>{skillCount} listings available</p>
         </div>
 
+        {/* REQUESTS */}
         <div
           className="dashboard-card"
           onClick={() => navigate("/requests")}
-          style={{ cursor: "pointer" }}
         >
-          <h5>🤝 Requests</h5>
-          <p>Manage sharing requests</p>
+          🤝 Requests
+          <p>{receivedCount} requests received</p>
         </div>
 
       </div>
+
     </div>
   );
 }

@@ -10,12 +10,18 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [course, setCourse] = useState("");
+  const [contact, setContact] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password.trim()) {
+  // ✅ ONLY ONE HANDLER (FORM SUBMIT)
+  const handleRegister = async (e) => {
+    e.preventDefault(); // 🔥 IMPORTANT
+
+    console.log("FORM SUBMITTED");
+
+    if (!name.trim() || !email.trim() || !password.trim() || !course.trim()) {
       setError("All fields are required");
       return;
     }
@@ -33,23 +39,28 @@ function Register() {
     }
 
     setError("");
-    console.log("Registered:", name, email);
     setLoading(true);
+
     try {
-      await register(name, email, password, course);
+      console.log("Calling API...");
+      const user = await register(name, email, password, course, contact);
+      console.log("SUCCESS:", user);
+
       navigate("/");
     } catch (err) {
-      setError("Registration failed. Try again");
+      console.log("ERROR:", err);
+      setError(
+        err?.response?.data?.message || "Registration failed. Try again"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    /* 🔥 ADD page-bg HERE */
     <div className="page-bg login-container">
-      
-      <div className="login-card">
+      {/* ✅ FORM handles everything */}
+      <form className="login-card" onSubmit={handleRegister}>
         <h2 className="login-title">Register</h2>
 
         {error && <p className="error-text">{error}</p>}
@@ -95,11 +106,19 @@ function Register() {
           </span>
         </div>
 
-        <button className="login-btn" onClick={handleRegister}>
+        <input
+          type="text"
+          placeholder="Enter contact number"
+          className="login-input"
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+        />
+
+        {/* ✅ IMPORTANT: type="submit" */}
+        <button type="submit" className="login-btn">
           {loading ? "Registering..." : "Register"}
         </button>
-      </div>
-
+      </form>
     </div>
   );
 }

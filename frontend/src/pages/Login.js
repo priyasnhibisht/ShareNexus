@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import { login } from "../services/authService";
 
@@ -80,12 +80,6 @@ function Login({ setIsLoggedIn }) {
         <button className="login-btn" onClick={handleLogin}>
           {loading ? "Logging in..." : "Login"}
         </button>
-
-        <div style={{ marginTop: '15px', fontSize: '13px' }}>
-          <Link to="/forgot-password" style={{ color: '#6366f1', textDecoration: 'none' }}>
-            Forgot Password?
-          </Link>
-        </div>
       </div>
 
     </div>

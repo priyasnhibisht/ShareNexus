@@ -5,6 +5,15 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
+// Create email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 // signup route
 router.post('/register', async (req, res) => {
   try {
@@ -126,12 +135,46 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour expiration
     await user.save();
 
-    // Since this is a college project and email clients are blocking the localhost navigation, 
-    // we bypass email and return the resetToken directly to the frontend for demonstration purposes!
-    return res.status(200).json({ 
-      message: 'Demo Mode: Automatically redirecting you to reset page...',
-      resetToken: resetToken 
-    });
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5001';
+    const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
+
+    // Send email with reset link
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: 'ShareNexus - Password Reset Request',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #6366f1;">Password Reset Request</h2>
+          <p>Hello ${user.name},</p>
+          <p>You requested a password reset for your ShareNexus account.</p>
+          <p>Click the button below to reset your password:</p>
+          <a href="${resetLink}" style="background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Reset Password</a>
+          <p>If the button doesn't work, copy and paste this link into your browser:</p>
+          <p style="word-break: break-all; color: #666;">${resetLink}</p>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this reset, please ignore this email.</p>
+          <p>Best regards,<br>ShareNexus Team</p>
+        </div>
+      `,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      return res.status(200).json({
+        message: 'Password reset email sent successfully. Check your inbox.',
+        resetToken,
+        resetLink,
+      });
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      // Still return success but with a note about email failure
+      return res.status(200).json({
+        message: 'Password reset token created, but email sending failed. Use the provided link.',
+        resetToken,
+        resetLink,
+      });
+    }
 
   } catch (err) {
     console.error('Forgot password error:', err);

@@ -1,0 +1,62 @@
+.listings-container {
+  display: flex;
+  gap: 40px;
+  padding: 40px;
+}
+
+.form-card {
+  flex: 1;
+  background: #2f3b52;
+  padding: 25px;
+  border-radius: 20px;
+}
+
+.form-card input,
+.form-card textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+}
+
+.form-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(90deg, #6a5cff, #4b3bff);
+  color: white;
+  font-weight: bold;
+}
+
+.list-card {
+  flex: 1;
+}
+
+.listing-item {
+  background: #2f3b52;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+.badge {
+  display: inline-block;
+  background: #6a5cff;
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.delete-btn {
+  background: red;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 10px;
+  color: white;
+}
+
+.error {
+  color: red;
+}

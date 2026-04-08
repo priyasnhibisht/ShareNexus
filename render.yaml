@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: sharenexus
+    env: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: MONGO_URI
+        value: mongodb+srv://priyanshi_bisht:05_priYanshi@cluster0.gphnf0b.mongodb.net/sharenexus?retryWrites=true&w=majority
+      - key: JWT_SECRET
+        value: sharenexussecret
+      - key: EMAIL_USER
+        value: priyanshibisht98@gmail.com
+      - key: EMAIL_PASS
+        value: oejy wtnj cprr ppkg
+      - key: FRONTEND_URL
+        value: https://sharenexus-vgz1.onrender.com
+      - key: BACKEND_URL
+        value: https://sharenexus-vgz1.onrender.com

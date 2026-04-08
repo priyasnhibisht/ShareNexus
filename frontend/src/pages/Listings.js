@@ -1,207 +1,139 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import {
+  getListings,
+  getMyListings,   // ✅ NEW
+  createListing,
+  deleteListing,
+} from "../services/listingService";
+import "./Listings.css";
 
-import { getCurrentUser } from "../services/authService";
-import { getAllListings, createListing } from "../services/listingService";
-
-function Listings({ filterCategory }) {
-  const user = getCurrentUser();
-
+function Listings({ category }) {
   const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(filterCategory || "resource");
-  const [ownerContact, setOwnerContact] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (filterCategory) {
-      setCategory(filterCategory);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ✅ FETCH ONLY USER LISTINGS
+  const fetchListings = async () => {
+    try {
+      const data = await getMyListings(); // ✅ IMPORTANT FIX
+
+      const filtered = data.filter(
+        (item) => item.category === category
+      );
+
+      setListings(filtered);
+    } catch (err) {
+      console.log("Error fetching listings", err);
     }
-  }, [filterCategory]);
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-    getAllListings()
-      .then((data) => {
-        if (isMounted) setListings(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        if (isMounted) setError("Failed to load listings");
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
+    if (!user) return;
+    fetchListings();
+  }, [category]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  if (!user) return <Navigate to="/" />;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  // ✅ CREATE
+  const handleCreate = async () => {
+    if (!title || !description ) {
+      setError("All fields required");
+      return;
+    }
 
     try {
-      await createListing({ title, description, category, ownerContact });
-      // Refresh after create.
-      const data = await getAllListings();
-      setListings(data);
+      await createListing({
+        title,
+        description,
+        category,
+        ownerName: user.name,
+        ownerId: user._id,
+      });
 
       setTitle("");
       setDescription("");
-      setCategory("resource");
-      setOwnerContact("");
+      setError("");
+
+      fetchListings();
     } catch (err) {
-      console.error(err);
-      setError("Failed to create listing");
+      console.log(err);
+      setError("Error creating listing");
     }
   };
 
-  const cardStyle = {
-    border: "1px solid #666",
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 12,
-    background: "#ffffff",
-    color: "#000000",
+  // ✅ DELETE
+  const handleDelete = async (id) => {
+    try {
+      await deleteListing(id); // ✅ userId already handled in service
+      fetchListings();
+    } catch (err) {
+      console.log(err);
+      setError("Failed to delete listing");
+    }
   };
 
-  const displayedListings = filterCategory
-    ? listings.filter((l) => l.category === filterCategory)
-    : listings;
-
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
-      <h2 style={{ marginBottom: 12 }}>Listings of Resources and Skills</h2>
+    <div className="listings-container">
 
-      {/* Create listing form */}
-      <div style={{ marginBottom: 18 }}>
-        <h4 style={{ marginBottom: 8 }}>Create a new listing</h4>
+      {/* ✅ CREATE FORM */}
+      <div className="form-card">
+        <h2>Create Listing ✨</h2>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ marginBottom: 4 }}>
-              <label style={{ color: "#ffffff" }}>Title</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{
-                width: "100%",
-                padding: 10,
-                color: "#000000",
-                background: "#ffffff",
-                border: "1px solid #ccc",
-                borderRadius: 4
-              }}
-            />
-          </div>
+        <label>Title</label>
+        <input
+          placeholder="e.g. Data Structures Notes"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ marginBottom: 4 }}>
-              <label style={{ color: "#ffffff" }}>Description</label>
-            </div>
-            <textarea
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              style={{
-                width: "100%",
-                padding: 10,
-                color: "#000000",
-                background: "#ffffff",
-                border: "1px solid #ccc",
-                borderRadius: 4
-              }}
-            />
-          </div>
+        <label>Description</label>
+        <textarea
+          placeholder="Explain what you are offering..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-          {!filterCategory && (
-            <div style={{ marginBottom: 10 }}>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: 10,
-                  color: "#000000",
-                  background: "#ffffff",
-                  border: "1px solid #ccc",
-                  borderRadius: 4
-                }}
-              >
-                <option value="resource">resource</option>
-                <option value="skill">skill</option>
-              </select>
-            </div>
-          )}
 
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ marginBottom: 4 }}>
-              <label style={{ color: "#ffffff" }}>Your Contact Number</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Your contact number"
-              value={ownerContact}
-              onChange={(e) => setOwnerContact(e.target.value)}
-              style={{
-                width: "100%",
-                padding: 10,
-                color: "#000000",
-                background: "#ffffff",
-                border: "1px solid #ccc",
-                borderRadius: 4
-              }}
-            />
-          </div>
+        <button onClick={handleCreate}>Create Listing</button>
 
-          <button type="submit" style={{ padding: "10px 16px" }}>
-            Create Listing
-          </button>
-        </form>
+        {error && <p className="error">{error}</p>}
       </div>
 
-      {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+      {/* ✅ USER LISTINGS */}
+      <div className="list-card">
+        <h2>Your Listings</h2>
 
-      {/* Listings */}
-      <div>
-        {loading ? (
-          <p>Loading listings...</p>
-        ) : displayedListings.length === 0 ? (
+        {listings.length === 0 ? (
           <p>No listings yet.</p>
         ) : (
-          displayedListings.map((l) => (
-            <div key={l._id} style={cardStyle}>
-              <h3 style={{ margin: "0 0 8px" }}>{l.title}</h3>
-              <p style={{ margin: "0 0 8px" }}>{l.description}</p>
-              <p style={{ margin: "0 0 6px" }}>
-                <strong>Category:</strong> {l.category}
-              </p>
-              <p style={{ margin: "0 0 6px" }}>
-                <strong>Owner:</strong> {l.ownerName}
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Availability:</strong>{" "}
-                {l.availability ? "Available" : "Not available"}
-              </p>
+          listings.map((item) => (
+            <div key={item._id} className="listing-item">
+
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+
+              <span className="badge">{item.category}</span>
+
+              <p><b>{item.ownerName}</b></p>
+
+              {/* ✅ DELETE ONLY IF OWNER */}
+              {user && user._id === item.ownerId && (
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(item._id)}
+                >
+                  Delete
+                </button>
+              )}
+
             </div>
           ))
         )}
       </div>
+
     </div>
   );
 }
 
 export default Listings;
-

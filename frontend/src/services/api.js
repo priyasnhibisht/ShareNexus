@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Centralized Axios instance for the ShareNexus backend.
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL ? `${process.env.REACT_APP_BACKEND_URL}/api` : '/api',
+const api=axios.create({
+  baseURL: "http://localhost:5001/api",
 });
 
 // Attach auth token from localStorage to every request.

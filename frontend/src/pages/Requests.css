@@ -1,0 +1,150 @@
+/* MAIN CONTAINER */
+.requests-container {
+  padding: 40px;
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+/* TITLE */
+.requests-title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* SECTION */
+.section {
+  margin-bottom: 40px;
+}
+
+.section h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+/* GRID */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* CARD */
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 22px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* TITLE */
+.card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+/* DESCRIPTION */
+.card p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+/* OWNER */
+.owner {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 10px;
+}
+
+/* TAG */
+.tag {
+  display: inline-block;
+  margin: 10px 0;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #6c63ff, #5a54e8);
+  border-radius: 20px;
+  font-size: 12px;
+  color: white;
+}
+
+/* BUTTONS */
+.primary-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #6c63ff, #5a54e8);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  opacity: 0.9;
+}
+
+/* APPROVE / REJECT */
+.btn-group {
+  margin-top: 10px;
+}
+
+.accept-btn {
+  background: #28c76f;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  color: white;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.reject-btn {
+  background: #ff4d4d;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+}
+
+/* CONTACT */
+.contact {
+  margin-top: 10px;
+  color: #ffd700;
+  font-size: 14px;
+}
+
+/* EMPTY STATE */
+.empty-card {
+  background: rgba(255,255,255,0.06);
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 16px;
+}
+
+/* MESSAGES */
+.success {
+  color: #28c76f;
+  margin-bottom: 10px;
+}
+
+.error {
+  color: #ff4d4d;
+  margin-bottom: 10px;
+}

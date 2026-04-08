@@ -2,20 +2,24 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { getCurrentUser } from "../services/authService";
-import { getAllListings } from "../services/listingService";
+import { getListings } from "../services/listingService";
 import {
   sendRequest,
-  getMyRequests,
+  getReceivedRequests,
   approveRequest,
   rejectRequest,
   getContact,
+  getSentRequests,
 } from "../services/requestService";
+
+import "./Requests.css";
 
 function Requests() {
   const user = getCurrentUser();
 
   const [listings, setListings] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]); // ✅ NEW
 
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingRequests, setLoadingRequests] = useState(true);
@@ -26,18 +30,16 @@ function Requests() {
   const [section2Error, setSection2Error] = useState("");
   const [contactByRequestId, setContactByRequestId] = useState({});
 
-  const cardStyle = {
-    border: "1px solid #666",
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 12,
-    background: "#ffffff",
-    color: "#000000",
+  // ✅ RECEIVED
+  const refreshMyRequests = async () => {
+    const data = await getReceivedRequests();
+    setRequests(data);
   };
 
-  const refreshMyRequests = async () => {
-    const data = await getMyRequests();
-    setRequests(data);
+  // ✅ SENT
+  const refreshSentRequests = async () => {
+    const data = await getSentRequests();
+    setSentRequests(data);
   };
 
   useEffect(() => {
@@ -45,23 +47,23 @@ function Requests() {
 
     if (!user) return;
 
+    // 🔹 Listings
     setLoadingListings(true);
-    getAllListings()
+    getListings()
       .then((data) => {
         if (isMounted) setListings(data);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         if (isMounted) setSection1Error("Failed to load listings");
       })
       .finally(() => {
         if (isMounted) setLoadingListings(false);
       });
 
+    // 🔹 Requests (BOTH)
     setLoadingRequests(true);
-    refreshMyRequests()
-      .catch((err) => {
-        console.error(err);
+    Promise.all([refreshMyRequests(), refreshSentRequests()]) // ✅ FIX
+      .catch(() => {
         if (isMounted) setSection2Error("Failed to load your requests");
       })
       .finally(() => {
@@ -71,165 +73,239 @@ function Requests() {
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, []);
 
   if (!user) return <Navigate to="/" />;
 
-  const handleSendRequest = async (listingId) => {
+  // ✅ SEND REQUEST
+  const handleSendRequest = async (listing) => {
     setSection1Message("");
     setSection1Error("");
 
+    if (listing.ownerId === user._id) {
+      setSection1Error("You cannot request your own resource ❌");
+      return;
+    }
+
     try {
-      await sendRequest(listingId);
-      setSection1Message("Request sent successfully");
+      await sendRequest(listing._id);
+      setSection1Message("Request sent successfully ✅");
+
       await refreshMyRequests();
+      await refreshSentRequests(); // ✅ FIX
     } catch (err) {
-      console.error(err);
-      setSection1Error("Failed to send request");
+      console.log(err);
+      setSection1Error("Failed to send request ❌");
     }
   };
 
+  // ✅ APPROVE
   const handleApprove = async (requestId) => {
-    setSection2Error("");
     try {
       await approveRequest(requestId);
+
       await refreshMyRequests();
-    } catch (err) {
-      console.error(err);
+      await refreshSentRequests(); // ✅ FIX
+    } catch {
       setSection2Error("Failed to approve request");
     }
   };
 
+  // ✅ REJECT
   const handleReject = async (requestId) => {
-    setSection2Error("");
     try {
       await rejectRequest(requestId);
+
       await refreshMyRequests();
-    } catch (err) {
-      console.error(err);
+      await refreshSentRequests(); // ✅ FIX
+    } catch {
       setSection2Error("Failed to reject request");
     }
   };
 
+  // ✅ GET CONTACT
   const handleGetContact = async (requestId) => {
-    setSection2Error("");
     try {
       const data = await getContact(requestId);
       setContactByRequestId((prev) => ({
         ...prev,
-        [requestId]: data?.ownerContact ?? data,
+        [requestId]: data,
       }));
-    } catch (err) {
-      console.error(err);
+    } catch {
       setSection2Error("Failed to get contact");
     }
   };
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", padding: 16 }}>
-      <h2 style={{ marginBottom: 12 }}>Requests</h2>
+    <div className="requests-container">
 
-      {/* SECTION 1 - Browse listings and send request */}
-      <div style={{ marginBottom: 26 }}>
-        <h3 style={{ color: "#ffffff" }}>Browse Listings</h3>
+      <h1 className="requests-title">Requests</h1>
 
-        {section1Message ? (
-          <p style={{ color: "seagreen" }}>{section1Message}</p>
-        ) : null}
-        {section1Error ? <p style={{ color: "crimson" }}>{section1Error}</p> : null}
+      {/* 🔹 SECTION 1 */}
+      <div className="section">
+        <h2>Browse Listings</h2>
+
+        {section1Message && <p className="success">{section1Message}</p>}
+        {section1Error && <p className="error">{section1Error}</p>}
 
         {loadingListings ? (
-          <p>Loading listings...</p>
+          <p>Loading...</p>
         ) : listings.length === 0 ? (
-          <p>No listings found.</p>
+          <div className="empty-card">No listings found 🚫</div>
         ) : (
-          listings.map((l) => (
-            <div key={l._id} style={cardStyle}>
-              <h3 style={{ margin: "0 0 8px" }}>{l.title}</h3>
-              <p style={{ margin: "0 0 6px" }}>
-                <strong>Category:</strong> {l.category}
-              </p>
-              <p style={{ margin: "0 0 6px" }}>
-                <strong>Owner:</strong> {l.ownerName}
-              </p>
+          <div className="cards">
+            {listings.map((l) => (
+              <div key={l._id} className="card">
+                <h3>{l.title}</h3>
+                <p>{l.description}</p>
 
-              <button
-                type="button"
-                style={{ padding: "10px 16px", cursor: "pointer" }}
-                onClick={() => handleSendRequest(l._id)}
-              >
-                Send Request
-              </button>
-            </div>
-          ))
+                <span className="tag">{l.category}</span>
+                <p className="owner">{l.ownerName}</p>
+
+                <button
+                  className="primary-btn"
+                  onClick={() => handleSendRequest(l)}
+                >
+                  Send Request
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* SECTION 2 - My received requests (as owner) */}
-      <div>
-        <h3 style={{ color: "#ffffff" }}>My Received Requests</h3>
+      {/* 🔹 SECTION 2 */}
+      <div className="section">
+        <h2>My Received Requests</h2>
 
-        {section2Error ? <p style={{ color: "crimson" }}>{section2Error}</p> : null}
+        {section2Error && <p className="error">{section2Error}</p>}
 
         {loadingRequests ? (
-          <p>Loading requests...</p>
+          <p>Loading...</p>
         ) : requests.length === 0 ? (
-          <p style={{ color: "#f8f8f8" }}>No requests yet. Contact details will appear here after you approve a request or receive one.</p>
+          <div className="empty-card">No requests yet 🤝</div>
         ) : (
-          requests.map((r) => (
-            <div key={r._id} style={cardStyle}>
-              <p style={{ margin: "0 0 6px" }}>
-                <strong>Requester:</strong> {r.requesterName}
-              </p>
-              <p style={{ margin: "0 0 6px" }}>
-                <strong>Listing:</strong> {r.listingTitle}
-              </p>
-              <p style={{ margin: "0 0 10px" }}>
-                <strong>Status:</strong> {r.status}
-              </p>
+          <div className="cards">
+            {requests.map((r) => (
+              <div key={r._id} className="card">
+                <h3>{r.listingTitle}</h3>
+                <p>From: {r.requesterName}</p>
 
-              {r.status === "pending" ? (
-                <div>
-                  <button
-                    type="button"
-                    style={{ padding: "10px 16px", cursor: "pointer", marginRight: 8 }}
-                    onClick={() => handleApprove(r._id)}
+                <p>
+                  Status:{" "}
+                  <span
+                    style={{
+                      color:
+                        r.status === "approved"
+                          ? "lightgreen"
+                          : r.status === "rejected"
+                          ? "red"
+                          : "orange",
+                      fontWeight: "bold",
+                    }}
                   >
-                    Approve
-                  </button>
-                  <button
-                    type="button"
-                    style={{ padding: "10px 16px", cursor: "pointer" }}
-                    onClick={() => handleReject(r._id)}
-                  >
-                    Reject
-                  </button>
-                </div>
-              ) : r.status === "approved" ? (
-                <div>
-                  <button
-                    type="button"
-                    style={{ padding: "10px 16px", cursor: "pointer" }}
-                    onClick={() => handleGetContact(r._id)}
-                  >
-                    Get Contact
-                  </button>
-                  {contactByRequestId[r._id] ? (
-                    <p style={{ marginTop: 10 }}>
-                      <strong>Contact:</strong> {contactByRequestId[r._id]}
-                    </p>
-                  ) : null}
-                </div>
-              ) : (
-                <p style={{ margin: 0 }}>Request {r.status}.</p>
-              )}
-            </div>
-          ))
+                    {r.status}
+                  </span>
+                </p>
+
+                {r.status === "pending" && (
+                  <div className="btn-group">
+                    <button
+                      className="accept-btn"
+                      onClick={() => handleApprove(r._id)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="reject-btn"
+                      onClick={() => handleReject(r._id)}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                )}
+
+                {r.status === "approved" && (
+                  <>
+                    <button
+                      className="primary-btn"
+                      onClick={() => handleGetContact(r._id)}
+                    >
+                      Get Contact
+                    </button>
+
+                    {contactByRequestId[r._id] && (
+                      <div className="contact">
+                        <p>📞 Phone: {contactByRequestId[r._id]?.requesterContact}</p>
+                        <p>📧 Email: {contactByRequestId[r._id]?.requesterEmail}</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
+
+      {/* 🔹 SECTION 3 */}
+      <div className="section">
+        <h2>My Sent Requests</h2>
+
+        {loadingRequests ? (
+          <p>Loading...</p>
+        ) : sentRequests.length === 0 ? (
+          <div className="empty-card">No sent requests 📭</div>
+        ) : (
+          <div className="cards">
+  {sentRequests.map((r) => (
+    <div key={r._id} className="card">
+      <h3>{r.listingTitle}</h3>
+      <p>To: {r.ownerName}</p>
+
+      <p>
+        Status:{" "}
+        <span
+          style={{
+            color:
+              r.status === "approved"
+                ? "lightgreen"
+                : r.status === "rejected"
+                ? "red"
+                : "orange",
+            fontWeight: "bold",
+          }}
+        >
+          {r.status}
+        </span>
+      </p>
+
+      {/* ✅ ONLY HERE r IS VALID */}
+      {r.status === "approved" && (
+        <>
+          <button
+            className="primary-btn"
+            onClick={() => handleGetContact(r._id)}
+          >
+            Get Contact
+          </button>
+
+          {contactByRequestId[r._id] && (
+            <div className="contact">
+              <p>📞 Phone: {contactByRequestId[r._id]?.ownerContact}</p>
+              <p>📧 Email: {contactByRequestId[r._id]?.ownerEmail}</p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  ))}
+</div>
+        )}
+      </div>
+
     </div>
   );
 }
 
 export default Requests;
-

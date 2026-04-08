@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import Listings from "./pages/Listings";
 import Requests from "./pages/Requests";
 import Home from "./pages/Home";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -21,6 +23,8 @@ function App() {
 
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* ✅ Protected */}
         <Route

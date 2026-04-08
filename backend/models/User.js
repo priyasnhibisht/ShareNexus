@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     course: { type: String, required: true, trim: true },
     phone: { type: String, default: '' },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );

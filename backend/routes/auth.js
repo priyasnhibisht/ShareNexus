@@ -134,8 +134,8 @@ router.post('/forgot-password', async (req, res) => {
 
     // Generate token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour expiration
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour expiration
     await user.save();
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5001';
@@ -166,14 +166,12 @@ router.post('/forgot-password', async (req, res) => {
       await transporter.sendMail(mailOptions);
       return res.status(200).json({
         message: 'Password reset email sent successfully. Check your inbox.',
-        resetToken,
-        resetLink,
       });
     } catch (emailError) {
       console.error('Email sending error:', emailError);
-      // Still return success but with a note about email failure
+      // Still return success but with a note about email failure in logs for demo
       return res.status(200).json({
-        message: 'Password reset token created, but email sending failed. Use the provided link.',
+        message: 'Password reset token created, but email sending failed. Check server logs.',
         resetToken,
         resetLink,
       });
@@ -186,19 +184,18 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 // reset password route
-router.post('/reset-password/:token', async (req, res) => {
+router.post('/reset-password', async (req, res) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
+    const { token, newPassword } = req.body;
 
-    if (!password) {
-      return res.status(400).json({ message: 'New password is required' });
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: 'Token and new password are required' });
     }
 
     // Find user by token and check if it has not expired
     const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() }
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() }
     });
 
     if (!user) {
@@ -206,12 +203,12 @@ router.post('/reset-password/:token', async (req, res) => {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update user
     user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
     await user.save();
 
     return res.status(200).json({ message: 'Success! Your password has been changed.' });

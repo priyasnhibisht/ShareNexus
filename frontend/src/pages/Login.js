@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 import { login } from "../services/authService";
 
@@ -80,6 +80,10 @@ function Login({ setIsLoggedIn }) {
         <button className="login-btn" onClick={handleLogin}>
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        <div className="login-footer">
+          <Link to="/forgot-password">Forgot Password?</Link>
+        </div>
       </div>
 
     </div>

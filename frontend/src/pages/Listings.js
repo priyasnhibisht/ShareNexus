@@ -104,35 +104,64 @@ function Listings({ category }) {
         {error && <p className="error">{error}</p>}
       </div>
 
-      {/* ✅ USER LISTINGS */}
+      {/* ✅ USER LISTINGS - GROUPED BY CATEGORY */}
       <div className="list-card">
         <h2>Your Listings</h2>
 
         {listings.length === 0 ? (
           <p>No listings yet.</p>
         ) : (
-          listings.map((item) => (
-            <div key={item._id} className="listing-item">
+          <>
+            {/* RESOURCES SECTION */}
+            {listings.some(l => l.category === 'resource') && (
+              <>
+                <h3 style={{ marginTop: '20px', borderBottom: '2px solid #007bff', paddingBottom: '10px' }}>📦 Resources</h3>
+                {listings
+                  .filter(l => l.category === 'resource')
+                  .map((item) => (
+                    <div key={item._id} className="listing-item">
+                      <h3>{item.title}</h3>
+                      <p>{item.description}</p>
+                      <span className="badge">{item.category}</span>
+                      <p><b>{item.ownerName}</b></p>
+                      {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDelete(item._id)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  ))}
+              </>
+            )}
 
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-
-              <span className="badge">{item.category}</span>
-
-              <p><b>{item.ownerName}</b></p>
-
-              {/* ✅ DELETE ONLY IF OWNER */}
-              {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(item._id)}
-                >
-                  Delete
-                </button>
-              )}
-
-            </div>
-          ))
+            {/* SKILLS SECTION */}
+            {listings.some(l => l.category === 'skill') && (
+              <>
+                <h3 style={{ marginTop: '20px', borderBottom: '2px solid #28a745', paddingBottom: '10px' }}>🎯 Skills</h3>
+                {listings
+                  .filter(l => l.category === 'skill')
+                  .map((item) => (
+                    <div key={item._id} className="listing-item">
+                      <h3>{item.title}</h3>
+                      <p>{item.description}</p>
+                      <span className="badge">{item.category}</span>
+                      <p><b>{item.ownerName}</b></p>
+                      {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDelete(item._id)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  ))}
+              </>
+            )}
+          </>
         )}
       </div>
 

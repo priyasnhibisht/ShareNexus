@@ -23,7 +23,6 @@ export const createListing = async (data) => {
 
   const newListing = {
     ...data,
-    category: "resource", // required field
     ownerName: user?.name || "Unknown", // fallback safe
     ownerId: user?._id,
   };

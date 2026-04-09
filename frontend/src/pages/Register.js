@@ -108,7 +108,7 @@ function Register() {
 
         <input
           type="tel"
-          placeholder="Phone number (optional)"
+          placeholder="Phone number"
           className="login-input"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}

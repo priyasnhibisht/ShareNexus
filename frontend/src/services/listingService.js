@@ -36,3 +36,9 @@ export const deleteListing = async (id) => {
   const res = await api.delete(`/listings/${id}`);
   return res.data;
 };
+
+// ✅ TOGGLE AVAILABILITY
+export const toggleAvailability = async (id) => {
+  const res = await api.patch(`/listings/${id}/availability`);
+  return res.data;
+};

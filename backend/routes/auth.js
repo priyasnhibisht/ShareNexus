@@ -4,8 +4,20 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { Resend } = require('resend');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// lazy init — only create the client when actually needed so the server
+// can still start even if RESEND_API_KEY is not set
+let resend = null;
+function getResend() {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not set in your .env file');
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 // signup route
 router.post('/register', async (req, res) => {
@@ -55,6 +67,7 @@ router.post('/register', async (req, res) => {
         email: user.email,
         course: user.course,
         phone: user.phone,
+        coins: user.coins,
         createdAt: user.createdAt,
       },
     });
@@ -103,6 +116,7 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         course: user.course,
+        coins: user.coins,
         createdAt: user.createdAt,
       },
     });
@@ -129,7 +143,7 @@ router.post('/forgot-password', async (req, res) => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
     console.log('4. Reset link:', resetLink);
     
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'ShareNexus <onboarding@resend.dev>',
       to: user.email,
       subject: 'Reset Your ShareNexus Password',
@@ -176,6 +190,17 @@ router.post('/reset-password', async (req, res) => {
   } catch (err) {
     console.error('Reset password error:', err);
     return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// get current user's coins
+router.get('/coins', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ coins: user.coins });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

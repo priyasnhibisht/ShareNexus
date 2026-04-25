@@ -28,6 +28,7 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
         ) : (
           <>
             <Link className="nav-btn" to="/dashboard">Dashboard</Link>
+            <Link className="nav-btn" to="/profile">Profile</Link>
 
             <button className="nav-btn logout" onClick={handleLogout}>
               Logout

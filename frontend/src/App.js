@@ -10,6 +10,7 @@ import Requests from "./pages/Requests";
 import Home from "./pages/Home";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -37,6 +38,7 @@ function App() {
         <Route path="/listings/skills" element={<Listings category="skill" />} />
 
         <Route path="/requests" element={<Requests />} />
+        <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

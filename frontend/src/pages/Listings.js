@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import {
-  getListings,
   getMyListings,   // ✅ NEW
   createListing,
   deleteListing,
+  toggleAvailability, // ✅ NEW
 } from "../services/listingService";
 import "./Listings.css";
 
@@ -13,10 +13,10 @@ function Listings({ category }) {
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = useMemo(() => JSON.parse(localStorage.getItem("user")), []);
 
   // ✅ FETCH ONLY USER LISTINGS
-  const fetchListings = async () => {
+  const fetchListings = useCallback(async () => {
     try {
       console.log('fetchListings: user from localStorage:', user);
       const data = await getMyListings(); // ✅ IMPORTANT FIX
@@ -32,12 +32,12 @@ function Listings({ category }) {
       console.error("Error fetching listings", err);
       setError("Error fetching listings: " + (err.message || JSON.stringify(err)));
     }
-  };
+  }, [category, user]);
 
   useEffect(() => {
     if (!user) return;
     fetchListings();
-  }, [category]);
+  }, [fetchListings, user]);
 
   // ✅ CREATE
   const handleCreate = async () => {
@@ -63,6 +63,17 @@ function Listings({ category }) {
     } catch (err) {
       console.log(err);
       setError("Error creating listing");
+    }
+  };
+
+  // ✅ TOGGLE STATUS
+  const handleToggleAvailability = async (id) => {
+    try {
+      await toggleAvailability(id);
+      fetchListings();
+    } catch (err) {
+      console.log(err);
+      setError("Failed to change status");
     }
   };
 
@@ -120,18 +131,31 @@ function Listings({ category }) {
                   .filter(l => l.category === 'resource')
                   .map((item) => (
                     <div key={item._id} className="listing-item">
-                      <h3>{item.title}</h3>
+                      <div className="listing-header">
+                        <h3>{item.title}</h3>
+                        <span className={`status-badge ${item.availability ? 'avail' : 'unavail'}`}>
+                          {item.availability !== false ? "Available" : "Unavailable"}
+                        </span>
+                      </div>
                       <p>{item.description}</p>
                       <span className="badge">{item.category}</span>
                       <p><b>{item.ownerName}</b></p>
-                      {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
+                      <div className="listing-actions">
                         <button
-                          className="delete-btn"
-                          onClick={() => handleDelete(item._id)}
+                          className={`toggle-btn ${item.availability ? 'unavail' : 'avail'}`}
+                          onClick={() => handleToggleAvailability(item._id)}
                         >
-                          Delete
+                          {item.availability !== false ? "Mark Unavailable" : "Mark Available"}
                         </button>
-                      )}
+                        {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(item._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
               </>
@@ -145,18 +169,31 @@ function Listings({ category }) {
                   .filter(l => l.category === 'skill')
                   .map((item) => (
                     <div key={item._id} className="listing-item">
-                      <h3>{item.title}</h3>
+                      <div className="listing-header">
+                        <h3>{item.title}</h3>
+                        <span className={`status-badge ${item.availability ? 'avail' : 'unavail'}`}>
+                          {item.availability !== false ? "Available" : "Unavailable"}
+                        </span>
+                      </div>
                       <p>{item.description}</p>
                       <span className="badge">{item.category}</span>
                       <p><b>{item.ownerName}</b></p>
-                      {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
+                      <div className="listing-actions">
                         <button
-                          className="delete-btn"
-                          onClick={() => handleDelete(item._id)}
+                          className={`toggle-btn ${item.availability ? 'unavail' : 'avail'}`}
+                          onClick={() => handleToggleAvailability(item._id)}
                         >
-                          Delete
+                          {item.availability !== false ? "Mark Unavailable" : "Mark Available"}
                         </button>
-                      )}
+                        {user && (user._id || user.id) === (item.owner?._id || item.owner?.toString()) && (
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(item._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
               </>

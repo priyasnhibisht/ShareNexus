@@ -7,6 +7,7 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const listingsRoutes = require('./routes/listings');
 const requestsRoutes = require('./routes/requests');
+const coinsRoutes = require('./routes/coins');
 
 const app = express();
 
@@ -27,6 +28,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingsRoutes);
 app.use('/api/requests', requestsRoutes);
+app.use('/api/coins', coinsRoutes);
 
 // Serves the frontend build directory statically
 app.use(express.static(path.join(__dirname, '../frontend/build')));

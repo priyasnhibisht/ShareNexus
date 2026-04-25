@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getListings } from "../services/listingService";
 import { getMyListings } from "../services/listingService";
 import { getReceivedRequests } from "../services/requestService";
 import { getCurrentUser } from "../services/authService";
@@ -9,7 +8,6 @@ import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const user = getCurrentUser();
 
   const [resourceCount, setResourceCount] = useState(0);
   const [skillCount, setSkillCount] = useState(0);

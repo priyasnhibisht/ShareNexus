@@ -53,6 +53,29 @@ router.get('/my/:userId', auth, async (req, res) => {
   }
 });
 
+// toggle availability (owner only)
+router.patch('/:id/availability', auth, async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) return res.status(404).json({ message: 'Listing not found' });
+
+    // check ownership
+    const ownerId = listing.owner.toString();
+    const userId = req.user.id || req.user._id;
+
+    if (ownerId !== userId.toString()) {
+      return res.status(403).json({ message: 'Not authorized to toggle this listing' });
+    }
+
+    listing.availability = !listing.availability;
+    await listing.save();
+
+    res.json(listing);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // delete a listing (owner only)
 router.delete('/:id', auth, async (req, res) => {
   try {

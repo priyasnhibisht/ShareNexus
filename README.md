@@ -35,7 +35,7 @@ It aims to reduce waste and build a helpful, connected ecosystem.
 ## 🌐 Live Website
 
 👉 Access the platform here:  
-[Visit ShareNexus](YOUR_WEBSITE_LINK_HERE)
+[Visit ShareNexus](https://sharenexus-vgz1.onrender.com)
 
 ---
 

@@ -32,6 +32,12 @@ It aims to reduce waste and build a helpful, connected ecosystem.
 5. Connect and exchange resources  
 
 ---
+## 🌐 Live Website
+
+👉 Access the platform here:  
+[Visit ShareNexus](YOUR_WEBSITE_LINK_HERE)
+
+---
 
 ## 👥 Team Members
 - Rudraksh Kumar  
